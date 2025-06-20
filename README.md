@@ -5,9 +5,9 @@ Anthropic provides a reference container, described [here](https://docs.anthropi
 I think this is a Very Good Idea. However, their container is designed for VS Code. This does the same thing, but is designed to be used in a terminal on its own. Perfect for use in tmux alongside your favorite editor.
 
 1. Build the Docker image: `./build.sh`
-2. Change to the directory you want Claude Code to have access to an run: `/path/to/run_claude_here.sh`
+2. Change to the directory you want Claude Code to have access to and run: `/path/to/run_claude_here.sh`
 
-If you want to change the command, for example to resume: `/path/to/run_claude_here.sh claude --resume`
+If you want to change the command, for example to resume, pass the command as an argument: `/path/to/run_claude_here.sh claude --resume`
 
 ## The Reference
 
