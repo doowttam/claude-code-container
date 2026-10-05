@@ -1,31 +1,67 @@
 # Claude Code Container
 
-Anthropic provides a reference container, described [here](https://docs.anthropic.com/en/docs/claude-code/security#development-container-reference-implementation), to restrict file and network access for Claude Code.
+A container and supporting scripts to reasonably sandbox Claude Code
+ - Includes a restrictive firewall that limits outward connections
+ - Based on Anthropic's original reference container, but with changes motivated by daily use
 
-I think this is a Very Good Idea. However, their container is designed for VS Code. This does the same thing, but is designed to be used in a terminal on its own. Perfect for use in tmux alongside your favorite editor.
+## Overview
 
-1. Build the Docker image: `./build.sh`
-2. Change to the directory you want Claude Code to have access to and run: `/path/to/run_claude_here.sh`
+Build the container from the repo directory:
 
-If you want to change the command, for example to resume, pass the command as an argument: `/path/to/run_claude_here.sh claude --resume`
+```
+$> ./build_podman.sh
+```
 
-## The Reference
+Run from your project directory:
 
-The reference is designed to be used with VS Code and consists of:
+```
+$> <path to repo>/run_claude_here_podman.sh
+```
 
-- [devcontainer.json](https://github.com/anthropics/claude-code/blob/main/.devcontainer/devcontainer.json): Controls container settings, extensions, and volume mounts
-- [Dockerfile](https://github.com/anthropics/claude-code/blob/main/.devcontainer/Dockerfile): Defines the container image and installed tools
-- [init-firewall.sh](https://github.com/anthropics/claude-code/blob/main/.devcontainer/init-firewall.sh): Establishes network security rules
+This will start Claude with your current directory mounted at `/workspace` in the container.
 
-## This Implementation
+## Project Scripts
 
-This implementation is based on that reference, but designed to be used outside of VS Code.
+**Podman Only**
 
-The components are:
+For particular projects you may need additional resources installed in your container. This might include libraries that need to be built within the container, or extra context like documentation.
 
-- build.sh: A single docker build command
-- Dockerfile: Defines the container and installs the tools used in the reference
-- entrypoint.sh: Updates the UID/GID of the node use to match the host user and sets up the firewall
-- init-firewall.sh: The same firewall script from the reference
-- run_claude_here.sh: Runs the `docker run` with all the required flags and mounts the current working directory as the workspace used by claude code
+Put a `Dockerfile.claude` (like `Dockerfile.claude.example`) in your project directory and use the project scripts to build/run a container with those additions. 
+
+Build the container from your project directory:
+
+```
+$> <path to repo>/build_project_claude_here.sh
+```
+
+Run from your project directory:
+
+```
+$> <path to repo>/run_project_claude_here.sh
+```
+
+## Components
+
+- Build scripts
+    - `build_docker.sh`: Build with docker
+    - `build_podman.sh`: Build with podman
+- Run scripts
+    - `run_claude_here_docker.sh`: Mount the current directory as your project and run with docker
+    - `run_claude_here_podman.sh`: Mount the current directory as your project and run with podman
+- Project scripts
+    - `build_project_claude_here.sh`: Build `Dockerfile.claude` on top of the main image, tied to this directory, with podman
+    - `run_project_claude_here.sh`: Run the container tied to this directory with podman
+- `Dockerfile`: Main sandbox container file
+- `entrypoint.sh`: Updates the UID/GID of the node user to match the host user and sets up the firewall
+- `init-firewall.sh`: Sets up the firewall with iptables
+
+## Security
+
+Motivated agents have proven to be escape artists. This sandbox is geared towards stopping coding agents before they go off on weird tangents and keeping them from trouncing your machine.
+
+**Do not rely on this to protect against malicious agents.** For one: the firewall rules live inside the container for convenience. If you're running potentially malicious software, definitely use the firewall on your host.
+
+## Why Docker and Podman scripts?
+
+I'm in the process of moving to rootless podman for all of my sandbox containers. This repo is in transition.
 

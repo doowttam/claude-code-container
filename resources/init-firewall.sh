@@ -54,9 +54,7 @@ done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 for domain in \
     "registry.npmjs.org" \
     "api.anthropic.com" \
-    "sentry.io" \
-    "statsig.anthropic.com" \
-    "statsig.com"; do
+    "sentry.io"; do
     echo "Resolving $domain..."
     ips=$(dig +short A "$domain")
     if [ -z "$ips" ]; then
@@ -75,7 +73,7 @@ for domain in \
 done
 
 # Get host IP from default route
-HOST_IP=$(ip route | grep default | cut -d" " -f3)
+HOST_IP=$(ip -4 route show default | awk '{print $3; exit}')
 if [ -z "$HOST_IP" ]; then
     echo "ERROR: Failed to detect host IP"
     exit 1

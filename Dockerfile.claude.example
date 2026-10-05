@@ -1,0 +1,12 @@
+FROM localhost/claude-code:latest
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install packages the agent may need
+RUN pip install pandas
+
+# Download up-to-date docs for agent access without network
+RUN mkdir -p /docs/svelte \
+    && curl https://svelte.dev/llms-medium.txt --output-dir /docs/svelte --remote-name
+
