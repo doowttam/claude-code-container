@@ -19,6 +19,7 @@ fi
 
 # Map host user to container's node user
 podman run \
+    --rm \
     --cap-add=NET_ADMIN \
     --cap-add=NET_RAW \
     --security-opt=label=disable \

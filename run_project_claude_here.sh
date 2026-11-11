@@ -23,6 +23,7 @@ if selinuxenabled 2>/dev/null; then
 fi
 
 podman run \
+    --rm \
     --cap-add=NET_ADMIN \
     --cap-add=NET_RAW \
     --security-opt=label=disable \

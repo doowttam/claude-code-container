@@ -17,6 +17,7 @@ WORKSPACE_MOUNT="${WORKSPACE_MOUNT:-$(pwd)}"
 echo "Binding $WORKSPACE_MOUNT to /workspace"
 
 docker run \
+    --rm \
     --env HOST_UID \
     --env HOST_GID \
     --cap-add=NET_ADMIN \
